@@ -18,7 +18,8 @@ import time
 from numpy import random
 import matplotlib.pylab as plt
 
-sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
+#sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
+sys.path.append('../resources/')
 
 import Stiefel_retractions as STR
 import Stiefel_Aux as StAux

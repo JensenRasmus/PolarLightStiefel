@@ -8,16 +8,15 @@ import sys
 from matplotlib import cm
 from matplotlib.colors import LightSource
 
-sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
-sys.path.append('../Stiefel_interp/')
-sys.path.append('../General_interp_tools/')
-
+# sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
+# sys.path.append('../Stiefel_interp/')
+# sys.path.append('../General_interp_tools/')
+sys.path.append('../resources/')
 import snapshot_analytic_mat    as snam
 import Stiefel_interp_funcs     as sifs
 import Stiefel_Exp_Log          as EL
 import Hermite_interp as HI
 import simulate_fisher as simfish
-import householder_tools as HST
 
 r = 0.3
 L = 30
@@ -54,7 +53,6 @@ if sign:
     ref_for_sign = 1
     U0 = np.copy(Us[ref_for_sign,:,:])
     for i in range(len(rs)):
-        
         Coord = Us[i,:,:].T @ U0
         Csign = np.diag(np.sign(np.diag(Coord)))
         Us[i,:,:] = Us[i,:,:] @ Csign
@@ -78,10 +76,10 @@ if sign:
 # print("----------------------------------------------")
 
 #A = np.array([[1/np.sqrt(2),0],[0,1],[1/np.sqrt(2),0]],dtype=float)
-U,R,Q = HST.house_qr(Us[0,:,:])
+# U,R,Q = HST.house_qr(Us[0,:,:])
 
-#U,R = HST.house_qr(A)
-W,Y = HST.house_block(U)
+# #U,R = HST.house_qr(A)
+# W,Y = HST.house_block(U)
 
 Us_c = np.copy(Us)
 for i in range(len(rs)):
@@ -108,7 +106,7 @@ ran = np.linspace(rs[0],rs[-1],Nd)
 di = np.zeros([Nd,1])
 sigmap_s = np.zeros([3,Nd])
 # Create reference data
-create_ref_data = 1
+create_ref_data = 0
 if create_ref_data:
     Uref = np.zeros([Nd,Nx,rank])
     Uref_c = np.zeros([Nd,Nx,rank])
@@ -150,7 +148,7 @@ else:
 
 np.save("sigma_ps",sigmap_s)
 
-plotSigma_p = True
+plotSigma_p = False
 if plotSigma_p:
     plt.rcParams.update({'font.size': 20})
     # for i in range(4):
@@ -165,7 +163,7 @@ if plotSigma_p:
     plt.show()
 
 
-Err = np.zeros([5,len(ran)])
+Err = np.zeros([6,len(ran)])
 alpha  = -0.5
 retra = 3
 
@@ -199,9 +197,9 @@ retra = 3
 #     Err[retra-1,k] = np.linalg.norm( U_star - Uref_c[k,:,:],'fro') / np.linalg.norm(Uref_c[k,:,:],'fro')
 
 # Interpolate using Riemann normal coords and Polar factor retraction
-comp_time = np.zeros([5,2])
+comp_time = np.zeros([6,2])
 for d in range(100):
-    for r in range(1,6):
+    for r in range(1,7):
         retra = r
         t_start = time.time()
         Deltas = sifs.Stiefel_geodesic_interp_pre(Us,\
@@ -228,7 +226,7 @@ for d in range(100):
         # print('  ***   ')
 
 
-print(comp_time/100)
+#print(comp_time/100)
 tim = time.time()
 U_star = sifs.Stiefel_geodesic_interp(Us,\
                                                     Deltas,\
@@ -244,6 +242,8 @@ print("PW linear, retra2 (polar factor):", Err[1,:].max())
 print("PW linear, retra3 (polar light ):", Err[2,:].max())  
 print("PW linear, retra4 (QD )         :", Err[3,:].max())  
 print("PW linear, retra4 (QR )         :", Err[4,:].max())  
+print("PW linear, retra5 (Cayley )         :", Err[5,:].max())  
+
 
 np.save('Errors',Err)
 
@@ -256,6 +256,7 @@ if do_plot:
     line_RBF3,  = plt.plot(ran, Err[2,:], 'k--.', linewidth=3, label = 'Errors PL')
     line_RBF3,  = plt.plot(ran, Err[3,:], 'b--.', linewidth=3, label = 'Errors QG')
     line_RBF2,  = plt.plot(ran, Err[4,:], 'r--', linewidth=3, label = 'Errors QR')
+    line_RBF2,  = plt.plot(ran, Err[4,:], 'b-', linewidth=3, label = 'Errors Cayley')
 
     #line_pts, = plt.plot(mu_samples, np.zeros((len(mu_samples),)),  'bo', linewidth=3, label = 'fk')
     plt.legend(loc = 2)
