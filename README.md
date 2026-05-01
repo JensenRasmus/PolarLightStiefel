@@ -2,7 +2,9 @@
 
 **Rasmus Jensen and Ralf Zimemrmann**
 
-Source code for reproducing the experiments in Section 4 of "An new polar factor retraction on the Stiefel manifold with closed-form inverse"
+Source code for reproducing the experiments in Section 4 of "An new polar factor retraction on the Stiefel manifold with closed-form inverse".
+
+For practical reasons, one might need to edit the files slightly to either generate data (True/False flags), as well as edit the dimensions, in order for the scripts to run. 
 
 Several scripts in this repository is taken from a [repositotry](https://github.com/RalfZimmermannSDU/RiemannStiefelLog) belonging to the author RZ.
 

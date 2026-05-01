@@ -171,7 +171,7 @@ A = np.random.rand(n,p)
 U0,R0 = np.linalg.qr(A,mode='reduced')
 
 N = 100 # Number of experiments
-Create_Us = False
+Create_Us = True
 if Create_Us:
     Xis = np.zeros((N,n,p))
     for k in range(N):
