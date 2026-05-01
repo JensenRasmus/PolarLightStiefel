@@ -1,4 +1,14 @@
 
+"""
+Script associated to Section 4.1
+
+It can produce the data associated to
+ - Figure 2
+
+The script produces .npy files, which 
+can be plotted using the Matlab routines 
+which can found in the 'figures' folder. 
+"""
 
 #------------------------------------------------------------------------------
 # Compare the cost of evolving a retraction as time increases. 
@@ -26,7 +36,8 @@ import time
 from numpy import random
 import matplotlib.pylab as plt
 
-sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
+#sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
+sys.path.append('../resources/')
 
 import Stiefel_retractions as STR
 import Stiefel_Aux as StAux
@@ -66,9 +77,7 @@ def run_timings(n,p):
     I = np.linspace(0,1,num = 11)
 
 
-
-
-    Time_data = np.zeros([7,3])
+    Time_data = np.zeros([8,3])
 
 
     print("*** Running Polar factor retraction ***")
@@ -130,9 +139,10 @@ def run_timings(n,p):
 
     XiW = Xi @ W
     WVT = W.T@VT.T
+    Sing2 = Sing**2
     t2 = time.time()
     for t in I:
-        Sing_t = np.sqrt(1/(t**2 * Sing**2 + 1))
+        Sing_t = np.sqrt(1/(t**2 * Sing2 + 1))
         STS_t = (WVT*Sing_t) @ VT
 
         Ut = (U0W @ ( (StAux.BlockExp(t*T)-t*T)) + t * XiW) @ STS_t
@@ -174,9 +184,10 @@ def run_timings(n,p):
 
     XiW = Xi @ W
     WVT = W.T@VT.T
+    Sing2 = Sing**2
     t2 = time.time()
     for t in I:
-        Sing_t = np.sqrt(1/(t**2 * Sing**2 + 1))
+        Sing_t = np.sqrt(1/(t**2 * Sing2  + 1))
         STS_t = (WVT*Sing_t) @ VT
 
         Ut = (U0W @ ( (StAux.Cayley_Blocked(t*T)-t*T)) + t * XiW) @ STS_t
@@ -325,8 +336,6 @@ def run_timings(n,p):
     #print(np.linalg.norm(U1 - Urec[:,0:p]))
 
     
-
-
     t2 = time.time()
 
     for t in I:
@@ -345,6 +354,37 @@ def run_timings(n,p):
     print("Interpolate: ",tend-t2)
     print("---------------------------------")
 
+
+    print("*** Running Cayley retraction ***")
+    t0 = time.time()
+    Xi = STR.Stiefel_inv_Cayley(U0,U1)
+
+    t1 = time.time()
+    A = U0.T @ Xi
+    B = Xi - U0 @ A
+
+    BTB = B.T @ B
+
+    t2 = time.time()
+
+    for t in I:
+        H = t/4 * BTB - t/2*A 
+
+        diag_ent = np.diag_indices(H.shape[0])
+        H[diag_ent] =  H[diag_ent] + 1.0
+
+        Y = -U0 + np.linalg.solve(H.T,(t*B.T+2*U0.T)).T
+    
+    tend = time.time()
+    Time_data[7,0] = t1-t0
+    Time_data[7,1] = t2-t1
+    Time_data[7,2] = tend-t2
+    print("------------- Times -------------")
+    print("Preprocess:  ",t1-t0)
+    print("Precompute:  ",t2-t1) 
+    print("Interpolate: ",tend-t2)
+    print("---------------------------------")
+
     return Time_data
 
 n = 10000
@@ -352,8 +392,8 @@ ps = np.array([500,1000,1500,2000])
 #ps = np.array([100,200,500,750,1000])
 #ps = np.array([2000])
 #ps = np.array([10,20,30,40,50])
-runtimes = np.zeros([len(ps),7])
-processtimes = np.zeros([len(ps),7])
+runtimes = np.zeros([len(ps),8])
+processtimes = np.zeros([len(ps),8])
 k = 0
 
 for p in ps:
@@ -362,8 +402,8 @@ for p in ps:
     processtimes[k,:] = Ttable[:,0].T + Ttable[:,1].T 
     k = k + 1
 
-# np.save('runtimes',runtimes)
-# np.save('processtimes',processtimes)
+np.save('runtimes',runtimes)
+np.save('processtimes',processtimes)
 # plt.rcParams.update({'font.size': 30})
 # my_dpi = 110
 # #plt.figure(figsize=(1400/my_dpi, 1500/my_dpi), dpi=my_dpi)

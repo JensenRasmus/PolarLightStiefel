@@ -1,6 +1,13 @@
-#------------------------------------------------------------------------------
-# Conduct the experiment in Section 4.2
-#------------------------------------------------------------------------------
+"""
+Script associated to Section 4.2
+
+It can produce the data associated to
+ - Table 2
+
+The script produces .npy files, which 
+can be plotted using the Matlab routines 
+which can found in the 'figures' folder. 
+"""
 import numpy as np
 import scipy
 import sys
@@ -9,7 +16,7 @@ import time
 from numpy import random
 import matplotlib.pylab as plt
 
-sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
+sys.path.append("../resources/")
 
 import Stiefel_retractions as STR
 import Stiefel_Aux as StAux
@@ -88,4 +95,4 @@ for k in range(Nt):
 print("Max error PF",np.max(err[0,:]))
 print("Max error PL",np.max(err[1,:]))
 
-# np.save('errs_n_'+str(n)+'_p_'+str(p),err)
+np.save('errs_n_'+str(n)+'_p_'+str(p),err)

@@ -1,3 +1,14 @@
+"""
+Script associated to Section 4.5
+
+It can produce the data associated to
+ - Figure 8
+
+The script produces .npy files, which 
+can be plotted using the Matlab routines 
+which can found in the 'figures' folder. 
+"""
+
 import numpy as np
 import sys
 import scipy.linalg as sc

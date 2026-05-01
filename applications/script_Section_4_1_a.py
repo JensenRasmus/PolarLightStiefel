@@ -1,3 +1,10 @@
+"""
+Script associated to Section 4.1 
+
+It can produce the data associated to
+ - Table 1
+
+"""
 #------------------------------------------------------------------------------
 # Compare the costs of a foward + backward step.
 # 
@@ -18,7 +25,6 @@ import time
 from numpy import random
 import matplotlib.pylab as plt
 
-#sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
 sys.path.append('../resources/')
 
 import Stiefel_retractions as STR
@@ -28,8 +34,8 @@ import Stiefel_Aux as StAux
 def timings(U0,Xis):
     #N = Xis.shape[0]
     N = 10
-    Ts = np.zeros((7,1))
-    Qual = np.zeros((7,1))
+    Ts = np.zeros((8,1))
+    Qual = np.zeros((8,1))
 
 
     # PF
@@ -129,6 +135,25 @@ def timings(U0,Xis):
     print("Avg. quality: ", str(Qual[4,0]/N))
     print("**************************************")
 
+    # Cayley retraction
+    for i in range(N):
+        U1 = STR.Stiefel_Cayley(U0,Xis[i,:,:]) 
+        #print(np.linalg.norm(U1.T@U1 - np.eye(p)))
+    
+        t0 = time.time()
+        Xiret = STR.Stiefel_inv_Cayley(U0,U1) 
+        t1 = time.time()
+        #print(np.linalg.norm(Xis[i,:,:] -STR.Stiefel_PF_inv_ret(U0,U1) ))
+        Ts[5] = Ts[5] + (t1-t0)
+        Qual[5] = Qual[5] + np.linalg.norm(Xiret -  Xis[i,:,:],'fro')
+
+    print("**************************************")
+    print("** Cayley retraction ***")
+    print("**************************************")
+    print("Avg. time:    ", str(Ts[5,0]/N))
+    print("Avg. quality: ", str(Qual[5,0]/N))
+    print("**************************************")
+
     
 
     Ts = Ts / N
@@ -169,7 +194,8 @@ if Create_Us:
 
         # U1 = UQ @ scipy.linalg.expm(S)
         Xis[k,:,:] = Xi
-        np.save("Xis_n_p_"+str(n)+"_"+str(p),Xis)
+        print(k)
+    np.save("Xis_n_p_"+str(n)+"_"+str(p),Xis)
 
 else:
     Xis = np.load("Xis_n_p_"+str(n)+"_"+str(p)+".npy")

@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Mar  4 10:13:20 2026
+Script associated to Section 4.1
 
-@author: zimmermann
+It can produce the data associated to
+ - Figure 1
+
+The script produces .npy files, which 
+can be plotted using the Matlab routines 
+which can found in the 'figures' folder. 
 """
 
 import numpy as np

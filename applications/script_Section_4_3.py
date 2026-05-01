@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Mar  4 10:13:20 2026
+Script associated Section 4.4
 
-@author: zimmermann
+It can produce the data associated to
+ - Figure 4 
+ - Figure 5
+ 
+The script produces .npy files, which 
+can be plotted using the Matlab routines 
+which can found in the 'figures' folder. 
 """
 
 import numpy as np
@@ -225,6 +231,7 @@ for mode in range(1,3):  # this gives mode in {1,2}
     t_pl    = t_end-t_start    # time under Riemann log
 
     np.save("err_coord_approx_mode"+str(mode),errors_coord_approx)
+
     print('time for Riemann coord curve     :', t_rl)
     print('time for polar factor coord curve:', t_pf)
     print('time for polar light        curve:', t_pl)       
@@ -232,7 +239,7 @@ for mode in range(1,3):  # this gives mode in {1,2}
     print(np.max(errors_coord_approx[:,0]), ' (Riemann baseline)')    
     print(np.max(errors_coord_approx[:,1]), ' (polar factor)')
     print(np.max(errors_coord_approx[:,2]), ' (polar light)')
-    do_plot = False
+    do_plot = True
     if do_plot:
         plt.rcParams.update({'font.size': 40})
         line_err_RL, = plt.plot(I_unit, errors_coord_approx[:,0], 'k--', linewidth=3, label = 'errors RL')
