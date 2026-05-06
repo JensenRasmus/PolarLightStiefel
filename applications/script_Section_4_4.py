@@ -20,9 +20,7 @@ import sys
 from matplotlib import cm
 from matplotlib.colors import LightSource
 
-# sys.path.append('../../../Stiefel_log_general_metric/SciPy/')
-# sys.path.append('../Stiefel_interp/')
-# sys.path.append('../General_interp_tools/')
+
 sys.path.append('../resources/')
 import snapshot_analytic_mat    as snam
 import Stiefel_interp_funcs     as sifs
@@ -69,50 +67,24 @@ if sign:
         Csign = np.diag(np.sign(np.diag(Coord)))
         Us[i,:,:] = Us[i,:,:] @ Csign
         
+# ref_for_sign = 1
+# U0 = np.copy(Us[ref_for_sign,:,:])
 
-
-# for i in [0,2]#range(0,len(rs)):
+# for i in range(len(rs)):
 #     Coord = Us[i,:,:].T @ U0
 #     Csign = np.diag(np.sign(np.diag(Coord)))
-#     Us[i,:,:] = Us[i,:,:] @ Csign
+#     print(Csign)
 
-
-# print(EL.distStiefel(Us[0,:,:],Us[-1,:,:]))
-
-# Check how the Stiefel logarithm behaves
-# print("----------------------------------------------")
-# print("Riemannian distance under the Euclidean metric")
-# print("U0 is the basis obtained for r = " + str(rs[0]))
-# print("Between U0 to U1: " + str(EL.distStiefel(Us[0,:,:] ,Us[1,:,:] ,-0.5)))
-# print("Between U0 to U2: " + str(EL.distStiefel(Us[0,:,:] ,Us[2,:,:] ,-0.5)))
-# print("----------------------------------------------")
-
-#A = np.array([[1/np.sqrt(2),0],[0,1],[1/np.sqrt(2),0]],dtype=float)
-# U,R,Q = HST.house_qr(Us[0,:,:])
-
-# #U,R = HST.house_qr(A)
-# W,Y = HST.house_block(U)
+# input("Press Enter to continue...")
+    
 
 Us_c = np.copy(Us)
 for i in range(len(rs)):
     Us_c[i,:,:] = Us[i,:,:]#HST.apply_WYT(Us[i,:,:] ,W,Y)
     
 
-
-#Us[2,:,:] = HST.apply_WYT(Us[2,:,:] ,W,Y)
-
-# # Orthogonality checks 
-# print(np.linalg.norm(Us[0,:,:].T @ Us[0,:,:] - np.eye(rank),'fro'))
-# print(np.linalg.norm(Us[1,:,:].T @ Us[1,:,:] - np.eye(rank),'fro'))
-# print(np.linalg.norm(Us[2,:,:].T @ Us[2,:,:] - np.eye(rank),'fro'))
-
-
-
-#Nd = 21 # number of data samples
-#ran = np.linspace(rs[0],rs[-1],Nd)
 Nd = 81
 ran = np.linspace(rs[0],rs[-1],Nd)
-#ran = np.linspace(0.1,0.6,Nd)
 
 
 di = np.zeros([Nd,1])
@@ -122,8 +94,6 @@ create_ref_data = 0
 if create_ref_data:
     Uref = np.zeros([Nd,Nx,rank])
     Uref_c = np.zeros([Nd,Nx,rank])
-    #Uref[0,:,:] = U0
-    #Uref_c[0,:,:] = Us_c[0,:,:] # To simplify the code when we addi tionally have to align the signs and perform centering
 
     for i in range(0,Nd):
         y = simfish.fisher_KKP(L,T,Nx,Nt,ran[i])
@@ -160,7 +130,7 @@ else:
 
 np.save("sigma_ps",sigmap_s)
 
-plotSigma_p = False
+plotSigma_p = True
 if plotSigma_p:
     plt.rcParams.update({'font.size': 20})
     # for i in range(4):
@@ -179,36 +149,6 @@ Err = np.zeros([6,len(ran)])
 alpha  = -0.5
 retra = 3
 
-# Interpolate using the Polar light
-# Deltas = sifs.Stiefel_geodesic_interp_pre(Us_c,\
-#                                             rs,\
-#                                             alpha,\
-#                                             retra)
-
-#U1 = Us_c[0,0:rank,0:rank]
-
-# for i in range(len(rs)-1):
-#     Delta = Deltas[i,:,:]
-#     A = Us_c[i,:,:].T @ Delta
-#     B = Delta - Us_c[i,:,:] @ A
-#     A_size = np.linalg.norm(A,'fro')
-#     B_size = np.linalg.norm(B,'fro')
-
-    #print("F-norm of A: " + str(A_size))
-    #print("F-norm of B: " + str(B_size))
-
-# for k in range(len(ran)):
-#     rs_star = ran[k]
-#     U_star = sifs.Stiefel_geodesic_interp(Us_c,\
-#                                             Deltas,\
-#                                             rs,\
-#                                             rs_star,\
-#                                             alpha,
-#                                             retra)
-    
-#     Err[retra-1,k] = np.linalg.norm( U_star - Uref_c[k,:,:],'fro') / np.linalg.norm(Uref_c[k,:,:],'fro')
-
-# Interpolate using Riemann normal coords and Polar factor retraction
 comp_time = np.zeros([6,2])
 for d in range(100):
     for r in range(1,7):
@@ -233,12 +173,6 @@ for d in range(100):
             Err[r-1,k] = np.linalg.norm( U_star - Uref[k,:,:],'fro') / np.linalg.norm(Uref[k,:,:],'fro')
         comp_time[r-1,1] = comp_time[r-1,1] + (time.time()-t_start)
 
-        # print('  ***   ') 
-        # print('Interpolation of ',len(ran),' data points took ', t_end-t_start, 's')
-        # print('  ***   ')
-
-
-#print(comp_time/100)
 tim = time.time()
 U_star = sifs.Stiefel_geodesic_interp(Us,\
                                                     Deltas,\
@@ -276,18 +210,3 @@ if do_plot:
     plt.ylabel('Errors')
     plt.show()
 
-
-#print(np.linalg.norm(Us[1,:,:] - Uref_c[1,:,:]))
-
-# Plot
-# x = np.linspace(-L,L,num = Nx)
-# t = np.linspace(0,T,Nt)
-
-# t, x = np.meshgrid(t, x)
-
-# fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
-# ls = LightSource(270, 45)
-# rgb = ls.shade(y, cmap=cm.gist_earth, vert_exag=0.1, blend_mode='soft')
-# surf = ax.plot_surface(x, t, y, rstride=1, cstride=1, facecolors=rgb,
-#                        linewidth=0, antialiased=False, shade=False)
-# plt.show()
