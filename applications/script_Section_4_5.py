@@ -1,183 +1,179 @@
 """
-Script associated to Section 4.5
+Script associated to Section 4.6
 
 It can produce the data associated to
- - Figure 8
-
+ - Figure 10
+ - Table 4
+ 
 The script produces .npy files, which 
 can be plotted using the Matlab routines 
 which can found in the 'figures' folder. 
 """
-
+#------------------------------------------------------------------------------
+# Compute the Riemannian center of mass of a geodesic triangle
+#------------------------------------------------------------------------------
 import numpy as np
+import scipy 
 import sys
-import scipy.linalg as sc
-import math
-import matplotlib.pyplot as plt
-import time
+from   scipy import linalg
+import time 
+from numpy import random
+import matplotlib.pylab as plt
 
-sys.path.append('../resources/')
+sys.path.append('../resources')
 
-import Stiefel_interp_funcs     as sifs
+import Stiefel_retractions as STR
+import Stiefel_Aux as StAux
+import Stiefel_Exp_Log as StEL
+import barycenters_aux as BAux
 
+np.random.seed(345894)
+# Set dimensions
+n = 200
+p = 30
 
-# Load dataset 
-sigmas = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+alpha  = -0.0
 
-D = np.loadtxt('../dataset/CallPrice_Vol=0.9.txt')
-m,n = D.shape
+# Optimization parameters
+Nmax = 1000
+tau = 1e-7
+delta = 0.5
+tol = 10e-10
 
-Data = np.zeros((9,n,m))
+A = np.random.rand(n,p)
+U0,R0 = np.linalg.qr(A,mode='reduced')
 
-k = 0
-for sigma in sigmas:
-    Data[k,:,:] = np.loadtxt('../dataset/CallPrice_Vol=' +str(sigma)+'.txt').T
-    k += 1
+Us = np.zeros((3,n,p))
+Xis = np.zeros((2,n,p))
+ws = np.ones((3,1))*1/3
 
-# Interpolate in sigma = 0.1, 0.5 and 0.9 ( k = 0, 4, 8)
-ss = np.array([0.1, 0.5, 0.9])
-
-# Obtain Stiefel data from a truncated SVD. 
-# We truncate at p = 5
-p = 5
-
-US = np.zeros((3,n,p))
-VS = np.zeros((3,m,p))
-SS = np.zeros((3,p))
-
-ks = [0,4,8]
-i = 0
-for k in ks:
-    U, S, VT = sc.svd(Data[k,:,:],\
-                        full_matrices=False,\
-                        compute_uv=True,\
-                        overwrite_a=True)
-    # So (U * S) @ VT = Data[k,:,:]
-    #print(sc.norm((U*S)@VT -Data[k,:,:]))
-    
-    # Truncate and save
-    US[i,:,:] = U[:,0:p]
-    V = VT.T
-    VS[i,:,:] = V[:,0:p]
-    SS[i,:] = S[0:p]
-    print(sc.norm((US[i,:,:] *SS[i,:])@VS[i,:,:].T -Data[k,:,:]))
-    i += 1
-
-# We must align the signs 
-U0 = US[0,:,:]
-
+Us[0,:,:] = U0
 for i in range(1,3):
-    Coord = US[i,:,:].T @ U0
-    Csign = np.diag(np.sign(np.diag(Coord)))
-    US[i,:,:] = US[i,:,:] @ Csign
+    A = np.random.rand(p,p) 
+    A = 0.5 * (A.T - A) # Now A is p x p skew
+    A = A / np.linalg.norm(A,'fro')
 
-    VS[i,:,:] = VS[i,:,:] @ Csign
+    B = np.random.rand(n,p) 
+    B = B / np.linalg.norm(B,'fro')
+    #B = np.zeros([n,p])
 
+    Xi = U0 @ A + (B - U0 @ (U0.T @ B))
+    Xis[i-1,:,:] = Xi / np.linalg.norm(Xi) * 0.8 * np.pi
 
-# We can now interpolate. Try sigma = 0.2
-sigmastar = 0.2
-alpha  = -0.5
+    Us[i,:,:] = StEL.Stiefel_Exp(U0,Xis[i-1,:,:],alpha)
 
-retra = 3
-Deltas_u = sifs.Stiefel_geodesic_interp_pre(US,\
-                                            ss,\
-                                            alpha,\
-                                            retra)
-
-Deltas_v = sifs.Stiefel_geodesic_interp_pre(VS,\
-                                            ss,\
-                                            alpha,\
-                                            retra)
-
-
-U_star = sifs.Stiefel_geodesic_interp(US,\
-                                            Deltas_u,\
-                                            ss,\
-                                            sigmastar,\
-                                            alpha,
-                                            retra)
-
-V_star = sifs.Stiefel_geodesic_interp(VS,\
-                                            Deltas_v,\
-                                            ss,\
-                                            sigmastar,\
-                                            alpha,
-                                            retra)
-
-# For SS we do linear interpolation
-def pre_linear_int(Locs, samples):
-    dims = Locs.shape
-    Deltas = np.zeros((dims[0],dims[1]))
-
-    for k in range(len(samples)-1):
-        Delta = Locs[k+1,:] - Locs[k,:]
-
-        Deltas[k,:] = Delta
-
-    return Deltas
-
-def linear_int(Locs,Deltas,samples, mu_star):
-    aux = abs(samples - mu_star)
-    index = np.argmin(aux)
-    if (mu_star < samples[index]) or abs(mu_star - samples[-1])<1.0e-15:
-        pos = index-1
-    else:
-        pos = index
-
-    Delta = Deltas[pos,:]
-    lin_factor = (mu_star - samples[pos])/(samples[pos+1] - samples[pos])
-    Y_star = lin_factor*Delta + Locs[pos,:]
-    return Y_star
-
-Deltas_S = pre_linear_int(SS,ss)
-SS_star = linear_int(SS,Deltas_S,ss,sigmastar)
-#SS_star = SS[0,:] + (SS[1,:] - SS[0,:]) /(0.5 - 0.1) *(sigmastar - 0.1)
-
-# Compute SVD
-Y_interp = (U_star*SS_star) @ V_star.T
+# Angle
+theta = np.acos(np.abs(np.trace(Xis[0,:,:].T @ Xis[1,:,:]))/(np.linalg.norm(Xis[0,:,:],'fro')*np.linalg.norm(Xis[1,:,:],'fro')))
+print(theta)
+# Checks
+# print(StEL.distStiefel(U0, Us[1,:,:], alpha))
+# print(StEL.distStiefel(U0, Us[2,:,:], alpha))
+# print("Intended dist: ", str(0.8*np.pi))
+# print(StEL.distStiefel(Us[1,:,:], Us[2,:,:], alpha))
 
 
-retractions = [1,2,3,4,5,6]
-rel_approx_err = np.zeros((6,len(sigmas)))
-for retra in retractions:
-    print("----------------------------------")
-    print("Interpolate using retraction nr. "+str(retra))
-    # Compute tangent vectors
-    Deltas_u = sifs.Stiefel_geodesic_interp_pre(US,\
-                                            ss,\
-                                            alpha,\
-                                            retra)
+U0 = np.copy(Us[0,:,:]) # Initial guess
 
-    Deltas_v = sifs.Stiefel_geodesic_interp_pre(VS,\
-                                                ss,\
-                                                alpha,\
-                                                retra)
+modes = [1,2,3,4,5]
+
+GradNorm = np.zeros((len(modes),Nmax))
+TimeStamp = np.zeros((len(modes),Nmax))
+fVals = np.zeros((len(modes),Nmax))
+N_iter = np.zeros((len(modes),1))
+Umus = np.zeros((len(modes),n,p))
+#modes = [2,3,4]
+
+for mode in modes:
+    U = np.copy(U0)
+    # k = 0
+    # # Record at time 0
+    # grad = BAux.gradient_RBC(U,Us,ws,mode)
+    # GradNorm[mode-1,k] = np.linalg.norm(grad,'fro')
+    # fVals[mode-1,k] = BAux.objective_RBC(U,Us,ws,mode)
+    
     k = 0
-    for sigmastar in sigmas:
-        print(sigmastar)
-        U_star = sifs.Stiefel_geodesic_interp(US,\
-                                            Deltas_u,\
-                                            ss,\
-                                            sigmastar,\
-                                            alpha,
-                                            retra)
+    fVals[mode-1,k] = BAux.objective_RBC(U,Us,ws,mode)
+    while k <= Nmax-2:
 
-        V_star = sifs.Stiefel_geodesic_interp(VS,\
-                                                Deltas_v,\
-                                                ss,\
-                                                sigmastar,\
-                                                alpha,
-                                                retra)
+        if mode == 1:
+        # Compute gradient 
+            t1 = time.time()
+            grad = BAux.gradient_RBC(U,Us,ws,mode)
+            U = StEL.Stiefel_Exp(U,-delta*grad)
+            t2 = time.time()
+        elif mode == 2: # PF
+            t1 = time.time()
+            grad = BAux.gradient_RBC(U,Us,ws,mode)
+            U = STR.Stiefel_PF_ret(U,-delta*grad)
+            t2 = time.time()
+        elif mode == 3: # PL 
+            t1 = time.time()
+            grad = BAux.gradient_RBC(U,Us,ws,mode)
+            U = STR.Stiefel_PL_ret(U,-delta*grad)
+            t2 = time.time()
+        elif mode == 4: # PL Cayley
+            t1 = time.time()
+            grad = BAux.gradient_RBC(U,Us,ws,mode)
+            U = STR.Stiefel_PL_ret(U,-delta*grad,mode = 2)
+            t2 = time.time()
+        elif mode == 5: # Cayley
+            t1 = time.time()
+            grad = BAux.gradient_RBC(U,Us,ws,mode)
+            U = STR.Stiefel_Cayley(U,-delta*grad)
+            t2 = time.time()
+        else:
+            grad = BAux.gradient_RBC(U,Us,ws,1)
+            U = U0
+
+        GradNorm[mode-1,k] = np.linalg.norm(grad,'fro')
+        # Check if converged
+        if GradNorm[mode-1,k] < tol:
+            # We terminate at iteration k - 1
+            Umus[mode - 1,:,:] = U
+            break
+        else:
+            if k % 10 == 0:
+                print('Mode = ',mode,' Iteration k = ',k)
+            k = k + 1
+            # Record time 
+            TimeStamp[mode-1,k] = TimeStamp[mode-1,k-1] + (t2 - t1)  
+            fVals[mode-1,k] = BAux.objective_RBC(U,Us,ws,mode)
         
-        SS_star = linear_int(SS,Deltas_S,ss,sigmastar)
+            
 
-        Y_interp = (U_star*SS_star) @ V_star.T
 
-        rel_approx_err[retra-1,k] = sc.norm(Y_interp - Data[k,:,:])/sc.norm(Data[k,:,:])
-        
-        k += 1
-        
-    print("----------------------------------")
+    N_iter[mode-1,0] = k
+    print("***  Ustar minus U1 and U2  ***")
+    print("Ustar,U0",StEL.distStiefel(U, Us[0,:,:], alpha))
+    print("Ustar,U1",StEL.distStiefel(U, Us[1,:,:], alpha))
+    print("Ustar,U2",StEL.distStiefel(U, Us[2,:,:], alpha))
+    # print("Ustar,U2 using inv PL", np.linalg.norm(STR.Stiefel_PL_inv_ret(U,Us[2,:,:])))
+    print("Sum     ",StEL.distStiefel(U, Us[0,:,:], alpha)+StEL.distStiefel(U, Us[1,:,:], alpha)+StEL.distStiefel(U, Us[2,:,:], alpha))
+    print("Time    ",TimeStamp[mode-1,k])
+    print("N_iter  ",N_iter[mode-1,0])
+    print("G. norm ",GradNorm[mode-1,k])
+    print("*** ** ** ** ** ** ** ** ** ***")
 
-print(rel_approx_err)
-#print(sc.norm(Y_interp - Data[1,:,:])/sc.norm(Data[1,:,:]))
+print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
+for i in range(1,5):
+    print("||Umu-Umu_Rie|| mode=",i+1," is ", np.linalg.norm(Umus[0,:,:] - Umus[i,:,:],'fro' ))
+    #print("||Umu-Umu_Rie|| mode=",i+1," is ", StEL.distStiefel(Umus[0,:,:], Umus[i,:,:], alpha))
+print("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
+
+            
+print(N_iter)
+# Checks
+# print(StEL.distStiefel(U, Us[1,:,:], alpha))
+# print(StEL.distStiefel(U, Us[2,:,:], alpha))
+
+
+# Export data
+# np.save("GradNorm",GradNorm)
+# np.save("N_iter",N_iter)
+# np.save("TimeStamp",TimeStamp)
+# np.save("fVals",fVals)
+
+np.save("GradNorm_canon",GradNorm)
+np.save("N_iter_canon",N_iter)
+np.save("TimeStamp_canon",TimeStamp)
+np.save("fVals_canon",fVals)
