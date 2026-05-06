@@ -9,6 +9,7 @@ npy-matlab-master/
 *.npy
 *.fig
 *.png
+*.DS_Store
 
 # Distribution / packaging
 .Python
