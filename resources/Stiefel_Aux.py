@@ -45,6 +45,7 @@
 
 import scipy
 import numpy as np
+import time as time
 from scipy import linalg
 #------------------------------------------------------------------------------
 # alpha-metric on T_U St(n,p)
@@ -408,6 +409,31 @@ def BlockInverse(T):
             k = k + 2
     return invT        
     
+def compute_block_product(T1,T2):
+    # Assume that T1 and T2 has the same block-structure
+    n = T1.shape[0]
+    prod = scipy.sparse.lil_matrix((n,n))
+    k = 0
+    while k < n:
+        if k == n-1:
+            # Last entry is a 1x1 block
+            if abs(T1[k,k]) < 1.0e-13:
+                print("Error: Last entry is zero-block")
+                print("Return 0")
+                return 0
+            prod[k,k] = T1[k,k] * T2[k,k]
+            k = k + 1
+        elif abs(T1[k+1,k])<1.0e-13:
+            # off-diagonal is zero, hence 1x1block
+            prod[k,k] = T1[k,k] * T2[k,k]  
+            k = k + 1
+        else:
+            # Regular 2 x 2 block
+            #
+            prod[k:k+2,k:k+2] = T1[k:k+2,k:k+2] @ T2[k:k+2,k:k+2]
+            k = k + 2
+    
+    return prod
 
 #------------------------------------------------------------------------------
 # Cayley trafo of X:
@@ -441,13 +467,17 @@ def Cayley_Blocked(X):
     Xminus = -0.5*X  # data is multiplied and copied to new array
     Xminus[diag_pp] = Xminus[diag_pp] + 1.0
     # form I+0.5X
-    Xplus  = 0.5*X   # data is multiplied and copied to new arra
+    Xplus  = 0.5*X   # data is multiplied and copied to new array
     Xplus[diag_pp] = Xplus[diag_pp] + 1.0
     XminusInv = BlockInverse(Xminus)
-    Cay = XminusInv @ Xplus
+    #Cay1 = XminusInv @ Xplus
+    Cay1 = compute_block_product(XminusInv,Xplus)
+
+    #print(np.linalg.norm(Cay1 - Cay2))
+    return Cay1
     #Cay = np.linalg.solve(Xminus, Xplus)
     
-    return Cay
+    # return Cay
 #-------------
 #------------------------------------------------------------------------------
 # inverse Cayley trafo of Y:
@@ -466,7 +496,6 @@ def Cayley_inv(Y):
                       # of making a matrix copy so that
                       # changes on Yplus do not change Y    
     Yplus[diag_pp]  = Yplus[diag_pp] + 1.0 
-    #Cay_inv = np.dot(Yminus, np.linalg.inv(Yplus)) 
     Cay_inv = np.linalg.solve(Yplus, Yminus)
     
     return Cay_inv
@@ -539,3 +568,31 @@ def A2sym(A):
     Asym = 0.5*(A+A.T)
     return Asym
 #------------------------------------------------------------------------------
+
+# def test_blockfuncs():
+#     np.random.seed(345345)
+#     n = 10000
+#     p = 300
+
+#     A = np.random.rand(n,p)
+#     U0,R0 = np.linalg.qr(A,mode='reduced')
+   
+#     # Generate a tangent vector at U0
+#     A = np.random.rand(p,p)
+#     A = 0.5 * (A.T - A) # Now A is p x p skew
+#     Xi = U0 @ A
+#     Xi = Xi / np.linalg.norm(Xi,'fro') # Normalize for stability 
+
+#     [T,P] = linalg.schur(A,output = 'real')
+
+#     t1 = time.time()
+#     A = Cayley_Blocked(T)
+#     t2 = time.time()
+#     print(t2 - t1)
+
+#     t1 = time.time()
+#     A = BlockExp(T)
+#     t2 = time.time()
+#     print(t2 - t1)
+
+# test_blockfuncs()

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script associated Section 4.4
+Script associated Section 4.2
 
 It can produce the data associated to
- - Figure 4 
- - Figure 5
+ - Figure 2
+ - Figure 3
  
 The script produces .npy files, which 
 can be plotted using the Matlab routines 
@@ -37,7 +37,7 @@ import matplotlib.pyplot as plt
     
 # set dimensions
 n = 1000
-p = 50
+p = 400
 np.random.seed(6013294)
 
 #for the Euclidean metric: alpha = -0.5

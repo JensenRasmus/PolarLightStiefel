@@ -1,8 +1,8 @@
 """
-Script associated to Section 4.2
+Script associated to Section 4.1
 
 It can produce the data associated to
- - Table 2
+ - Table 1
 
 The script produces .npy files, which 
 can be plotted using the Matlab routines 

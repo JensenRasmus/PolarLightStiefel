@@ -4,7 +4,7 @@
 Script associated to Section 4.1
 
 It can produce the data associated to
- - Figure 1
+ - Figure 4
 
 The script produces .npy files, which 
 can be plotted using the Matlab routines 
@@ -37,7 +37,7 @@ n = 10000
 metric_alpha = -0.5
     
 # set number of random experiments
-runs = 10
+runs = 1
 dist = 1.0*np.pi
 
 #initialize

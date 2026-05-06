@@ -146,6 +146,11 @@ def Stiefel_PL_ret(U0, Xi, mode=1):
         STS  = np.dot(VT.T*Sing, VT)
    
     # assemble U1
+    # S = np.eye(p) + np.dot(S.T, S)
+    # S = scipy.linalg.sqrtm(scipy.linalg.inv(S))
+    # # assemble U1
+    # U1 = U1.dot(S)
+    
     U1 = U1.dot(STS)
     return U1
 #------------------------------------------------------------------------------
@@ -163,45 +168,35 @@ def Stiefel_PL_ret(U0, Xi, mode=1):
 #------------------------------------------------------------------------------
 def Stiefel_PL_inv_ret(U0, U1, mode=1):
     # get dimensions
-    print = False
-    n,p = U0.shape
-    t1 = time.time()
-    U0TU1 = np.dot(U0.T,U1)
-    t2 = time.time()
-    if print:
-        print("Time for U0TU1: " + str(t2-t1))
 
-    t1 = time.time()
+    n,p = U0.shape
+
+    U0TU1 = np.dot(U0.T,U1)
+
     M, S, RT = scipy.linalg.svd(U0TU1,\
                                full_matrices=True,\
                                compute_uv=True,\
                                overwrite_a=True)
-    t2 = time.time()
-    if print:
-        print("Time for SVD: " + str(t2-t1))
-
-    t1 = time.time()      
+     
     MRT = M.dot(RT)
-    t2 = time.time()
-    if print:
-        print("Time for M*R^T: " + str(t2-t1))
-
-    t1 = time.time()
     RinvSRT = np.dot( (RT.T*(1./S)), RT)
-    t2 = time.time()
-    if print:
-        print("Time fo RinvSRT: " + str(t2-t1))
 
     # assemble Xi
     if mode == 1:
         Xi = U0.dot((linalg.logm(MRT) - MRT)) + U1.dot(RinvSRT)
     else:
         # Cayley trafo for replacing the logm
-        t1 = time.time()
         Xi = U0.dot((StAux.Cayley_inv(MRT) - MRT)) + U1.dot(RinvSRT)
-        t2 = time.time()
-        if print:
-            print("Time for inv Cayley transform + assembly: " + str(t2-t1))
+
+    # t1 = time.time()
+    # linalg.logm(MRT) 
+    # t2 = time.time()
+    # print(t2-t1)
+
+    # t1 = time.time()
+    # StAux.Cayley_inv(MRT) 
+    # t2 = time.time()
+    # print(t2-t1)
     return Xi
 
 #------------------------------------------------------------------------------
@@ -454,6 +449,53 @@ def Stiefel_inv_Cayley(U0,U1):
     # Idea 2: solve two linear systems
 
     return Xi
+
+timing_PL_PLinv = False
+if timing_PL_PLinv:
+    np.random.seed(345345)
+    n = 1000
+    p = 200
+
+    A = np.random.rand(n,p)
+    U,R0 = np.linalg.qr(A,mode='reduced')
+   
+    # Generate a tangent vector at U0
+    A = np.random.rand(p,p)
+    A = 0.5 * (A.T - A) # Now A is p x p skew
+    Xi = U @ A
+    Xi = Xi / np.linalg.norm(Xi,'fro') # Normalize for stability 
+
+    t1 = time.time()
+    Y2 = Stiefel_PL_ret(U,Xi,mode=1);
+    t2 = time.time()
+    #print(t2-t1)
+
+    t1 = time.time()
+    Xi = Stiefel_PL_inv_ret(U,Y2,mode=1);
+    t2 = time.time()
+    #rint(t2-t1)
+
+
+testPLinv = False
+if testPLinv:
+    np.random.seed(345345)
+    n = 10000
+    p = 2000
+
+    A = np.random.rand(n,p)
+    U,R0 = np.linalg.qr(A,mode='reduced')
+   
+    # Generate a tangent vector at U0
+    A = np.random.rand(p,p)
+    A = 0.5 * (A.T - A) # Now A is p x p skew
+    Xi = U @ A
+    Xi = Xi / np.linalg.norm(Xi,'fro') # Normalize for stability 
+
+    Y2 = Stiefel_PL_ret(U,Xi,mode=1);
+    Xi2 = Stiefel_PL_inv_ret(U,Y2,mode = 1)
+
+    Y2 = Stiefel_PL_ret(U,Xi,mode=2);
+    Xi2 = Stiefel_PL_inv_ret(U,Y2,mode = 2)
 
 testeffCay = False
 if testeffCay:

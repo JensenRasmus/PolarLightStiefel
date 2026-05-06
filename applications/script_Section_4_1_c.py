@@ -1,9 +1,9 @@
 
 """
-Script associated to Section 4.1
+Script associated to Section 4.3
 
 It can produce the data associated to
- - Figure 2
+ - Figure 5
 
 The script produces .npy files, which 
 can be plotted using the Matlab routines 
@@ -75,7 +75,6 @@ def run_timings(n,p):
 
     # Time interval
     I = np.linspace(0,1,num = 11)
-
 
     Time_data = np.zeros([8,3])
 

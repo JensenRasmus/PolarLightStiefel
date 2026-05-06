@@ -2,7 +2,7 @@
 Script associated to Section 4.1 
 
 It can produce the data associated to
- - Table 1
+ - Table 3
 
 """
 #------------------------------------------------------------------------------
