@@ -1,5 +1,5 @@
 """
-Script associated to Section 4.1 
+Script associated to Section 4.3
 
 It can produce the data associated to
  - Table 3
