@@ -25,13 +25,6 @@ import matplotlib.pyplot as plt
 
 
 
-#******************************************************************************
-#  ||    Experiment associated with 
-#  ||    Table 1, Fig. 3, Fig. 4 (to-do update references) of
-#  ||    "AN NEW POLAR FACTOR RETRACTION ON THE STIEFEL
-# \  /    MANIFOLD WITH CLOSED-FORM INVERSE"
-#  \/     
-#******************************************************************************
 
 
     
@@ -104,26 +97,7 @@ print('time for polar light retraction: ', time_array[1]/runs)
 print('normcheck', is_equal[1]/runs)  
     
     
-#**************************************************************************
-#
-# ALL ACTIONS ARE PERFORMED UNDER THE EUCLIDEAN METRIC
-#
-# Experiment 1: compare retractions to geodesic
-# we still have the data triple
-# U0, U1, Xi 
-# with 
-# exp_U0(Xi) = U1.
-#
-# geodesic:  Exp_U0(t*Xi), t \in [0,1]
-# 
-# any retraction R_U0 connecting the same endpoints:
-# (1) compute R_U0^{-1}(U1). This yields tangent vector Xi_R.
-# with 
-#       R_U0(Xi_R) = U1.
-# (2) evaluate retraction curve
-#       R_U0(t*Xi), t\in [0,1]
-# (3) compute error between geodesic and retraction curve
-#**************************************************************************
+
     
     
 for mode in range(1,3):  # this gives mode in {1,2}
@@ -173,26 +147,7 @@ for mode in range(1,3):  # this gives mode in {1,2}
         plt.xlabel('t')
         plt.ylabel('Errors')
         plt.show()
-        
-    #**************************************************************************
-    #
-    # ALL ACTIONS ARE PERFORMED UNDER THE EUCLIDEAN METRIC
-    #
-    # Experiment 2: compare inverse retractions to Riemannian logarithm
-    # we still have the data triple
-    # U0, U1, Xi 
-    # with 
-    #  Exp_U0(Xi) = U1.
-    #
-    # Form the previous experiment, we have the Stiefel geodesic
-    #  geo_t: t \to Exp_U0(t*Xi)
-    # 
-    # Here, we take this curve and pull it back to the coordinate domain
-    # by using an inverse retraction R_U0^{-1}.
-    # When the logarithm is used, this should give the straight line.
-    #
-    # ALL ACTIONS ARE PERFORMED UNDER THE EUCLIDEAN METRIC
-    #**************************************************************************
+
     errors_coord_approx = np.zeros((num_t,3))
     # 1st column: errors under Riemann log (should be close to 0)
     # 2nd column: errors under inverse polar factor retraction
