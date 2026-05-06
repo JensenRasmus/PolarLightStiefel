@@ -2,10 +2,13 @@
 __pycache__/
 *.py[codz]
 *$py.class
+npy-matlab-master/
 
 # C extensions
 *.so
 *.npy
+*.fig
+*.png
 
 # Distribution / packaging
 .Python

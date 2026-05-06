@@ -2,12 +2,12 @@ clear all
 close all
 clc
 
-str = "err_coord_approx_mode2";
+str = "err_coord_approx_mode1";
 %str = "err_coord_approx_mode1_p400";
 errs = readNPY(str+'.npy')';
 
-labs = {'RL','PF','PL Cay'};
-colors_r = {[0 0 0],[1 0 0],[0 0 1]};
+labs = {'Exp','PF','PL'};
+colors_r = {[0.2310    0.6660    0.1960],[1 0 0],[0 0 1]};
 linestyles = {'-','--',':'};
 
 xla = 't';
