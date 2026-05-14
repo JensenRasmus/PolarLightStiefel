@@ -29,10 +29,10 @@ import barycenters_aux as BAux
 
 np.random.seed(345894)
 # Set dimensions
-n = 200
-p = 30
+n = 1500
+p = 400
 
-alpha  = -0.0
+alpha  = -0.5
 
 # Optimization parameters
 Nmax = 1000
@@ -168,12 +168,12 @@ print(N_iter)
 
 
 # Export data
-# np.save("GradNorm",GradNorm)
-# np.save("N_iter",N_iter)
-# np.save("TimeStamp",TimeStamp)
-# np.save("fVals",fVals)
+np.save("GradNorm",GradNorm)
+np.save("N_iter",N_iter)
+np.save("TimeStamp",TimeStamp)
+np.save("fVals",fVals)
 
-np.save("GradNorm_canon",GradNorm)
-np.save("N_iter_canon",N_iter)
-np.save("TimeStamp_canon",TimeStamp)
-np.save("fVals_canon",fVals)
+# np.save("GradNorm_canon",GradNorm)
+# np.save("N_iter_canon",N_iter)
+# np.save("TimeStamp_canon",TimeStamp)
+# np.save("fVals_canon",fVals)

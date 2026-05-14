@@ -6,7 +6,7 @@ npy-matlab-master/
 
 # C extensions
 *.so
-*.npy
+
 *.fig
 *.png
 *.DS_Store

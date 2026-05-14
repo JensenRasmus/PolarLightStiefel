@@ -387,8 +387,8 @@ def run_timings(n,p):
     return Time_data
 
 n = 10000
-#ps = np.array([500,1000,1500,2000])
-ps = np.array([100,200,500,750,1000])
+ps = np.array([500,1000,1500,2000])
+#ps = np.array([100,200,500,750,1000])
 #ps = np.array([2000])
 #ps = np.array([10,20,30,40,50])
 runtimes = np.zeros([len(ps),8])

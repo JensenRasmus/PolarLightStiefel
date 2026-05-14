@@ -1,5 +1,5 @@
 close all
-timings_p_retracton = readNPY('timings_p_retractions_large.npy')';
+timings_p_retracton = readNPY('timings_p_retractions.npy')';
 timings_p_retracton = timings_p_retracton;
 
 % Color standard
