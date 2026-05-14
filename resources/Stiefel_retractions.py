@@ -50,6 +50,9 @@ def Stiefel_PF_ret(U0, Xi):
         # sqrt( 1/(1+sing^2)), addition is elementwise
         Sing = np.sqrt(1/(Sing*Sing + 1))
         STS  = np.dot(VT.T*Sing, VT)
+        # print(np.linalg.norm(Xi))
+        # print(np.linalg.norm(STS))
+        # input("Press any key")
         
     # perform U1 = U0*M + Q*N
     U1 = np.dot((U0+Xi),STS)
@@ -74,11 +77,28 @@ def Stiefel_PF_inv_ret(U0, U1):
     n,p = U0.shape
     
     M = (-1)*np.dot(U0.T,U1)
-    # solve MX + XM = -2*eye(p)
-    
+    # E,P = np.linalg.eig(M)
+    # E2,P2 = np.linalg.eig(M.T)
+    # np.linalg.cond(M)
+    # print(E)
+    # print(E2)
+    # print(np.linalg.cond(M))
+    # phi = np.kron(np.eye(p),M) + np.kron(M.T,np.eye(p))
+    # print(np.linalg.norm(np.linalg.inv(phi)))
+    # #print(np.linalg.norm(np.linalg.inv(phi),'fro'))
+    # print(np.linalg.norm((-2)*np.eye(p,p),'fro'))
+    # X = scipy.linalg.solve_sylvester(M, M.T, (-2)*np.eye(p,p))
+    # print(np.linalg.norm(X,'fro'))
+    # input("Press any key")
     X = scipy.linalg.solve_sylvester(M, M.T, (-2)*np.eye(p,p))
     
     Xi = U1.dot(X) - U0
+
+    # A = U0.T @ Xi
+    # B = Xi - U0 @ A
+    # c,p = np.linalg.eig(np.eye(p)+Xi.T@Xi)
+    # print(c)
+    # input("Press any key")
         
     return Xi
 #------------------------------------------------------------------------------

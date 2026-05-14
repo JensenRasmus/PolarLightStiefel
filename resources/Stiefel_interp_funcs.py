@@ -90,6 +90,8 @@ def Stiefel_geodesic_interp_pre(Locs, samples, metric_alpha = 0.0, retra=1):
                                                 metric_alpha)
         elif retra == 2:
             # polar factor retraction
+            # D = StRe.Stiefel_PF_inv_ret(Locs[k,:,:],\
+            #                                  Locs[k+2,:,:])  
             Delta =  StRe.Stiefel_PF_inv_ret(Locs[k,:,:],\
                                              Locs[k+1,:,:])             
         elif retra == 3:

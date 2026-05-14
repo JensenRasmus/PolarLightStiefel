@@ -2,7 +2,7 @@
 Script associated to Section 4.5
 
 It can produce the data associated to
- - Figure 10
+ - Figure 7
  - Table 4
  
 The script produces .npy files, which 

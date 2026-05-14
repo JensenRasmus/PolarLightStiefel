@@ -2,8 +2,7 @@
 Script associated to Section 4.4
 
 It can produce the data associated to
- - Figure 6
- - Figure 7
+ - Figure 5
 
 The script produces .npy files, which 
 can be plotted using the Matlab routines 
@@ -130,7 +129,7 @@ else:
 
 np.save("sigma_ps",sigmap_s)
 
-plotSigma_p = True
+plotSigma_p = False
 if plotSigma_p:
     plt.rcParams.update({'font.size': 20})
     # for i in range(4):
@@ -158,6 +157,11 @@ for d in range(100):
                                                     rs,\
                                                     alpha,\
                                                     retra)
+        
+        
+        #     print("A norm" + str(np.linalg.norm(A)))
+        #     print("B norm" + str(np.linalg.norm(Delta - U @ A)))
+        # input("Press any key")
         comp_time[r-1,0] = comp_time[r-1,0] + (time.time()-t_start)
 
         t_start = time.time()
@@ -173,6 +177,14 @@ for d in range(100):
             Err[r-1,k] = np.linalg.norm( U_star - Uref[k,:,:],'fro') / np.linalg.norm(Uref[k,:,:],'fro')
         comp_time[r-1,1] = comp_time[r-1,1] + (time.time()-t_start)
 
+        # print("For Deltas[1,:,:] obtained from retraction ",r)
+        # Delta = Deltas[0,:,:]
+        # U = Us[0,:,:]
+        # A = U.T@Delta
+        # B = Delta - U@A
+        # print("Norm of A",str(np.linalg.norm(A)))
+        # print("Norm of B",str(np.linalg.norm(B)))
+        # input("PR")
 tim = time.time()
 U_star = sifs.Stiefel_geodesic_interp(Us,\
                                                     Deltas,\

@@ -6,6 +6,7 @@ Script associated Section 4.2
 It can produce the data associated to
  - Figure 2
  - Figure 3
+ - Table 2
  
 The script produces .npy files, which 
 can be plotted using the Matlab routines 
@@ -136,7 +137,7 @@ for mode in range(1,3):  # this gives mode in {1,2}
     print('Max errors mode ', mode, ' are:')
     print(np.max(errors_geo_approx[:,0]), ' (polar factor)')
     print(np.max(errors_geo_approx[:,1]), ' (polar light)')
-    do_plot = False
+    do_plot = True
     if do_plot:
         plt.rcParams.update({'font.size': 40})
 

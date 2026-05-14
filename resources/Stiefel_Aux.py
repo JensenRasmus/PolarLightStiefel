@@ -470,8 +470,11 @@ def Cayley_Blocked(X):
     Xplus  = 0.5*X   # data is multiplied and copied to new array
     Xplus[diag_pp] = Xplus[diag_pp] + 1.0
     XminusInv = BlockInverse(Xminus)
-    #Cay1 = XminusInv @ Xplus
-    Cay1 = compute_block_product(XminusInv,Xplus)
+
+    Cay1 = XminusInv @ Xplus # More efficient than home-brewed implementation. XminusInv is sparse
+
+    # Cay1 = compute_block_product(XminusInv,Xplus)
+    
 
     #print(np.linalg.norm(Cay1 - Cay2))
     return Cay1

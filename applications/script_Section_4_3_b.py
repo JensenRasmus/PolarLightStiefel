@@ -4,7 +4,7 @@
 Script associated to Section 4.1
 
 It can produce the data associated to
- - Figure 4
+ - Figure 3
 
 The script produces .npy files, which 
 can be plotted using the Matlab routines 
@@ -37,7 +37,7 @@ n = 10000
 metric_alpha = -0.5
     
 # set number of random experiments
-runs = 1
+runs = 10
 dist = 1.0*np.pi
 
 #initialize
@@ -78,7 +78,7 @@ for p in [500,1000,1500,2000]:
         time_array[2,k] = time_array[2,k] + (t_end-t_start)
         
         t_start = time.time()    
-        Xi_pli  = StRet.Stiefel_PL_inv_ret(U0, U1_pf,mode)
+        Xi_pli  = StRet.Stiefel_PL_inv_ret(U0, U1,mode)
         t_end   = time.time() 
         time_array[3,k] = time_array[3,k] + (t_end-t_start) 
         
@@ -90,7 +90,7 @@ for p in [500,1000,1500,2000]:
         time_array[4,k] = time_array[4,k] + (t_end-t_start)
         
         t_start = time.time()    
-        Xi_pli  = StRet.Stiefel_PL_inv_ret(U0, U1_pf,mode)
+        Xi_pli  = StRet.Stiefel_PL_inv_ret(U0, U1,mode)
         t_end   = time.time() 
         time_array[5,k] = time_array[5,k] + (t_end-t_start)   
         #sys.exit()

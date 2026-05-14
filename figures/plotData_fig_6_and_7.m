@@ -3,7 +3,7 @@ close all
 clc
 
 errs = readNPY('Errors.npy');
-sigs = readNPY('sigma_ps.npy');
+%sigs = readNPY('sigma_ps.npy');
 
 labs = {'Exp','PF','PL','QG Gr.','QR','Cayley'};
 
@@ -14,7 +14,7 @@ linestyles = {'-.','-','--',':'};
 markers = {'*','o','s','d','v'};
 figure
 hold on
-xla = 't';
+xla = '\rho';
 yla = 'Error';
 idx = linspace(0.1,0.9,size(errs,2));
 for k = 1:size(errs,1)
@@ -58,7 +58,7 @@ saveas(fig, 'fisher_experiment.png');
 linestyles = {':','--','-.'};
 colors = {[0 0 0],[1 0 0],[0 0 1]};
 labs = {'\sigma_{p-1}','\sigma_{p}','\sigma_{p+1}'};
-xla = 't';
+xla = 'r';
 yla = 'Magnitude';
 
 figure
