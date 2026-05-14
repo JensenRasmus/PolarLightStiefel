@@ -10,4 +10,6 @@ In the head of each file in the folder *applications*, it is indicated what figu
 To use the Matlab scripts in the *figures* folder, one has to use the package 'readNPY'. 
 Place the [folder containing the git repository npy-matlab]{https://github.com/kwikteam/npy-matlab/tree/master} in the 'figures' folder, in order for the Matlab scripts to run.  
 
-Several scripts in this repository is taken from a [repositotry](https://github.com/RalfZimmermannSDU/RiemannStiefelLog) belonging to the author RZ. There, a slightly different convention for the Riemannian metric used ($\alpha$-metrics). Letting $\alpha=0$ yields the canonical metric, and $\alpha = -0.5$ yields the Euclidean metric. 
+Several scripts in this repository is taken from a [repositotry](https://github.com/RalfZimmermannSDU/RiemannStiefelLog) belonging to the author RZ. There, a slightly different convention for the Riemannian metric used ($\alpha$-metrics). Letting $\alpha=0$ yields the canonical metric, and $\alpha = -0.5$ yields the Euclidean metric.
+
+The *dataset* folder contains data provided by Kristian Debrabant, SDU. It is used for an experiment not featuring in the SISC manuscript. 
